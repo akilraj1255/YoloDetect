@@ -78,21 +78,21 @@ const App = () => {
         <img
           src="#"
           ref={imageRef}
-          onLoad={() => detectPose(imageRef.current, model, canvasRef.current)}
+          onLoad={() => detect(imageRef.current, model, canvasRef.current)}
         />
         <video
           autoPlay
           muted
           ref={cameraRef}
           onPlay={() =>
-            detectPose(cameraRef.current, model, canvasRef.current)
+            detectVideo(cameraRef.current, model, canvasRef.current)
           }
         />
         <video
           autoPlay
           muted
           ref={videoRef}
-          onPlay={() => detectPose(videoRef.current, model, canvasRef.current)}
+          onPlay={() => detectVideo(videoRef.current, model, canvasRef.current)}
         />
         <canvas
           width={model.inputShape[1]}
