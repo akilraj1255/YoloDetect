@@ -48,6 +48,7 @@ const App = () => {
     });
   }, []);
 
+  
   return (
     <div className="App">
       {loading.loading && <Loader>Loading model... {(loading.progress * 100).toFixed(2)}%</Loader>}

@@ -27,6 +27,7 @@ const colors = {
   rightAnkle: 'black'
 };
 
+
 const connections = [
   ['nose', 'leftEye'],
   ['nose', 'rightEye'],

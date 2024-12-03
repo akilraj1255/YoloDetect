@@ -41,6 +41,7 @@ const preprocess = (source, modelWidth, modelHeight) => {
 };
 
 
+
 /**
  * Function run inference and do detection from source.
  * @param {HTMLImageElement|HTMLVideoElement} source
