@@ -55,6 +55,14 @@ const App = () => {
     });
   }, []);
 
+  const handleVideoLoadedData = () => {
+    if (cameraRef.current && cameraRef.current.readyState >= 2) {
+      detectPose(cameraRef.current, model, canvasRef.current).catch((error) => {
+        console.error("Error during pose detection:", error);
+      });
+    }
+  };
+
   return (
     <div className="App">
       {loading.loading && (
@@ -75,13 +83,15 @@ const App = () => {
         <img
           src="#"
           ref={imageRef}
-          onLoad={() => detectPose(imageRef.current, model, canvasRef.current)}
+          onLoad={() => detectPose(imageRef.current, model, canvasRef.current).catch((error) => {
+            console.error("Error during pose detection:", error);
+          })}
         />
         <video
           autoPlay
           muted
           ref={cameraRef}
-          onLoadedData={() => detectPose(cameraRef.current, model, canvasRef.current)}
+          onLoadedData={handleVideoLoadedData}
         />
         <ButtonHandler
           imageRef={imageRef}
