@@ -1,18 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import * as tf from "@tensorflow/tfjs";
-//import "@tensorflow/tfjs-backend-webgl"; // set backend to webgl
 import "@tensorflow/tfjs-backend-webgpu";
 import Loader from "./components/loader";
 import ButtonHandler from "./components/btn-handler";
-import { detect, detectVideo } from "./utils/detect";
+import { detectPose, detectVideo } from "./utils/detect"; // Import detectPose
 import "./style/App.css";
 
 tf.setBackend("webgpu"); // set backend to webgpu
 
 /**
- * App component for YOLO11 Live Detection Application.
- *
- * This component initializes and loads a YOLO11 model using TensorFlow.js,
+ * This component initializes and loads a pose detection model using TensorFlow.js,
  * sets up references for image, camera, video, and canvas elements, and
  * handles the loading state and model configuration.
  */
@@ -64,9 +61,9 @@ const App = () => {
         <Loader>Loading model... {(loading.progress * 100).toFixed(2)}%</Loader>
       )}
       <div className="header">
-        <h1>📷 YOLO11 Live Detection App</h1>
+        <h1>📷 Pose Detection App</h1>
         <p>
-          YOLO11 live detection application on browser powered by{" "}
+          Pose detection application on browser powered by{" "}
           <code>tensorflow.js</code>
         </p>
         <p>
@@ -84,28 +81,9 @@ const App = () => {
           autoPlay
           muted
           ref={cameraRef}
-          onPlay={() =>
-            detectPose(cameraRef.current, model, canvasRef.current)
-          }
-        />
-        <video
-          autoPlay
-          muted
-          ref={videoRef}
-          onPlay={() => detectPose(videoRef.current, model, canvasRef.current)}
-        />
-        <canvas
-          width={model.inputShape[1]}
-          height={model.inputShape[2]}
-          ref={canvasRef}
+          onLoadedData={() => detectPose(cameraRef.current, model, canvasRef.current)}
         />
       </div>
-
-      <ButtonHandler
-        imageRef={imageRef}
-        cameraRef={cameraRef}
-        videoRef={videoRef}
-      />
     </div>
   );
 };

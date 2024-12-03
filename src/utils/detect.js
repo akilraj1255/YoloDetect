@@ -69,3 +69,4 @@ export const detectVideo = (video, model, canvasRef) => {
 
   detectFrame(); // initialize to detect every frame
 };
+
