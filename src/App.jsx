@@ -83,6 +83,11 @@ const App = () => {
           ref={cameraRef}
           onLoadedData={() => detectPose(cameraRef.current, model, canvasRef.current)}
         />
+        <ButtonHandler
+          imageRef={imageRef}
+          cameraRef={cameraRef}
+          videoRef={videoRef}
+        />
       </div>
     </div>
   );
