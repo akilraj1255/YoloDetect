@@ -1,18 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as tf from "@tensorflow/tfjs";
-import "@tensorflow/tfjs-backend-webgpu";
+import "@tensorflow/tfjs-backend-webgl"; // set backend to webgl
 import Loader from "./components/loader";
 import ButtonHandler from "./components/btn-handler";
-import { detectPose, detectVideo } from "./utils/detect"; // Import detectPose
+import { detect, detectVideo } from "./utils/detect";
 import "./style/App.css";
-
-tf.setBackend("webgpu"); // set backend to webgpu
-
-/**
- * This component initializes and loads a pose detection model using TensorFlow.js,
- * sets up references for image, camera, video, and canvas elements, and
- * handles the loading state and model configuration.
- */
 
 const App = () => {
   const [loading, setLoading] = useState({ loading: true, progress: 0 }); // loading state
@@ -32,7 +24,7 @@ const App = () => {
 
   useEffect(() => {
     tf.ready().then(async () => {
-      const yolo11 = await tf.loadGraphModel(
+      const yolov8 = await tf.loadGraphModel(
         `${window.location.href}/${modelName}_web_model/model.json`,
         {
           onProgress: (fractions) => {
@@ -40,39 +32,29 @@ const App = () => {
           },
         }
       ); // load model
-
       // warming up model
-      const dummyInput = tf.ones(yolo11.inputs[0].shape);
-      const warmupResults = yolo11.execute(dummyInput);
-
+      const dummyInput = tf.ones(yolov8.inputs[0].shape);
+      const warmupResults = yolov8.execute(dummyInput);
       setLoading({ loading: false, progress: 1 });
       setModel({
-        net: yolo11,
-        inputShape: yolo11.inputs[0].shape,
+        net: yolov8,
+        inputShape: yolov8.inputs[0].shape,
       }); // set model & input shape
+
+
+      console.log(warmupResults.dataSync()[4000])
 
       tf.dispose([warmupResults, dummyInput]); // cleanup memory
     });
   }, []);
 
-  const handleVideoLoadedData = () => {
-    if (cameraRef.current && cameraRef.current.readyState >= 2) {
-      detectPose(cameraRef.current, model, canvasRef.current).catch((error) => {
-        console.error("Error during pose detection:", error);
-      });
-    }
-  };
-
   return (
     <div className="App">
-      {loading.loading && (
-        <Loader>Loading model... {(loading.progress * 100).toFixed(2)}%</Loader>
-      )}
+      {loading.loading && <Loader>Loading model... {(loading.progress * 100).toFixed(2)}%</Loader>}
       <div className="header">
-        <h1>📷 Pose Detection App</h1>
+        <h1>📷 YOLOv8 Live Pose Detection App</h1>
         <p>
-          Pose detection application on browser powered by{" "}
-          <code>tensorflow.js</code>
+          YOLOv8 live pose detection application on browser powered by <code>tensorflow.js</code>
         </p>
         <p>
           Serving : <code className="code">{modelName}</code>
@@ -83,22 +65,24 @@ const App = () => {
         <img
           src="#"
           ref={imageRef}
-          onLoad={() => detectPose(imageRef.current, model, canvasRef.current).catch((error) => {
-            console.error("Error during pose detection:", error);
-          })}
+          onLoad={() => detect(imageRef.current, model, canvasRef.current)}
         />
         <video
           autoPlay
           muted
           ref={cameraRef}
-          onLoadedData={handleVideoLoadedData}
+          onPlay={() => detectVideo(cameraRef.current, model, canvasRef.current)}
         />
-        <ButtonHandler
-          imageRef={imageRef}
-          cameraRef={cameraRef}
-          videoRef={videoRef}
+        <video
+          autoPlay
+          muted
+          ref={videoRef}
+          onPlay={() => detectVideo(videoRef.current, model, canvasRef.current)}
         />
+        <canvas width={model.inputShape[1]} height={model.inputShape[2]} ref={canvasRef} />
       </div>
+
+      <ButtonHandler imageRef={imageRef} cameraRef={cameraRef} videoRef={videoRef} />
     </div>
   );
 };

@@ -18,9 +18,7 @@ export class Webcam {
         .then((stream) => {
           videoRef.srcObject = stream;
         });
-    } else {
-      alert("Can't open Webcam!");
-    }
+    } else alert("Can't open Webcam!");
   };
 
   /**
@@ -33,8 +31,6 @@ export class Webcam {
         track.stop();
       });
       videoRef.srcObject = null;
-    } else {
-      alert("Please open Webcam first!");
-    }
+    } else alert("Please open Webcam first!");
   };
 }
